@@ -8,17 +8,6 @@ import {
   nextTideSelector,
 } from './tidesSlice';
 
-function prettyTime(epochTime: number) {
-  const time = new Date(epochTime);
-  let hours = time.getHours();
-  const ampm = hours < 12 ? 'AM' : 'PM';
-  if (hours > 12) hours -= 12;
-  let minutes = time.getMinutes().toFixed();
-  if (minutes.length === 1) minutes = `0${minutes}`;
-
-  return `${hours}:${minutes} ${ampm}`
-}
-
 function cap(string: string) {
   return string.charAt(0).toUpperCase() + string.slice(1);
 }
@@ -60,7 +49,7 @@ export function Now() {
   }
 
   return (
-    <div className="container px-4">
+    <div className="px-4">
       <div className="text-center mb-4">
         <span className="text-6xl sm:text-8xl text-blue-200">Tide {estCurrentTide.toFixed(1)} ft</span>
       </div>

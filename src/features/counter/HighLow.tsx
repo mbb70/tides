@@ -1,4 +1,3 @@
-import { off } from 'process';
 import React from 'react';
 
 import { useAppSelector } from '../../app/hooks';
@@ -9,8 +8,6 @@ import {
   nextHighTide,
   averageHighTide,
   averageLowTide,
-  highestTide,
-  lowestTide,
 } from './tidesSlice';
 
 function prettyTimeDelta(deltaMillis: number) {
@@ -79,8 +76,6 @@ export function HighLow() {
   const high = useAppSelector(nextHighTide);
   const averageLow = useAppSelector(averageLowTide);
   const averageHigh = useAppSelector(averageHighTide);
-  const lowestLow = useAppSelector(lowestTide);
-  const highestHigh = useAppSelector(highestTide);
 
   const offAvgHigh = high.v - averageHigh;
   const offAvgLow = low.v - averageLow;
@@ -90,7 +85,7 @@ export function HighLow() {
   const highNote = Math.abs(offAvgHigh) > 1 ? `${Math.abs(offAvgHigh).toFixed(1)} ft. ${highAboveBelow} average` : undefined;
 
   return (
-    <div className="container flex flex-col sm:flex-row">
+    <div className="flex flex-col sm:flex-row">
       <HighLowCard className="sm:mr-2" title="Next Low" time={time} tide={low} note={lowNote}/>
       <HighLowCard className="sm:ml-2" title="Next High" time={time} tide={high} note={highNote} />
     </div>
