@@ -59,6 +59,13 @@ export const nextHighTide = createSelector(nextTideIndex, dataSelector, (nextTid
   return data[nextTideIndex].type === 'H' ? data[nextTideIndex] : data[nextTideIndex + 1];
 });
 
+export const followingLowTide = createSelector(nextTideIndex, dataSelector, (nextTideIndex, data) => {
+  return data[nextTideIndex].type === 'L' ? data[nextTideIndex + 2] : data[nextTideIndex + 3];
+});
+export const followingHighTide = createSelector(nextTideIndex, dataSelector, (nextTideIndex, data) => {
+  return data[nextTideIndex].type === 'H' ? data[nextTideIndex + 2] : data[nextTideIndex + 3];
+});
+
 export const lowTides = createSelector(dataSelector, (data) => {
   return data.filter((e) => e.type === 'L');
 });

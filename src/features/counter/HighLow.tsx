@@ -6,6 +6,8 @@ import {
   selectTime,
   nextLowTide,
   nextHighTide,
+  followingLowTide,
+  followingHighTide,
   averageHighTide,
   averageLowTide,
 } from './tidesSlice';
@@ -44,7 +46,10 @@ function prettyTimeGivenCurrentTime(epochTime: number, currentEpochTime: number)
   return `${month} ${time.getDate()} ${dayOfWeek} ${hours}:${time.getMinutes()} ${ampm}`
 }
 
-function HighLowCard(props: { className: string, time: number, title: string, tide: DataEntry, note?: string }) {
+function HighLowCard(props: { className: string, time: number, title: string, tide: DataEntry, avg: number }) {
+  const offAvg = props.tide.v - props.avg;
+  const aboveBelow = offAvg > 0 ? 'above' : 'below';
+  const note = Math.abs(offAvg) > 1 ? `${Math.abs(offAvg).toFixed(1)} ft. ${aboveBelow} average` : undefined;
   return (
     <div className={`sm:w-1/2 p-2 my-2 mx-4 sm:my-4 rounded-xl bg-blue-200 ${props.className}`}>
       <div className="text-4xl mb-3 text-center">{props.title}</div>
@@ -57,12 +62,12 @@ function HighLowCard(props: { className: string, time: number, title: string, ti
         </div>
       </div>
       <div className="md:flex">
-        <div className={`text-xl p-2 ${props.note ? 'md:w-1/2 md:mr-1' : 'w-full'} rounded-xl mt-2 bg-blue-300 text-center`}>
+        <div className={`text-xl p-2 ${note ? 'md:w-1/2 md:mr-1' : 'w-full'} rounded-xl mt-2 bg-blue-300 text-center`}>
           <span>{prettyTimeDelta(props.tide.t - props.time)}</span>
         </div>
-        {props.note && (
+        {note && (
           <div className="text-xl p-2 md:w-1/2 md:ml-1 rounded-xl mt-2 bg-blue-300 text-center">
-            <span>{props.note}</span>
+            <span>{note}</span>
           </div>
         )}
       </div>
@@ -74,20 +79,21 @@ export function HighLow() {
   const time = useAppSelector(selectTime);
   const low = useAppSelector(nextLowTide);
   const high = useAppSelector(nextHighTide);
+  const low2 = useAppSelector(followingLowTide);
+  const high2 = useAppSelector(followingHighTide);
   const averageLow = useAppSelector(averageLowTide);
   const averageHigh = useAppSelector(averageHighTide);
 
-  const offAvgHigh = high.v - averageHigh;
-  const offAvgLow = low.v - averageLow;
-  const lowAboveBelow = offAvgLow > 0 ? 'above' : 'below';
-  const highAboveBelow = offAvgHigh > 0 ? 'above' : 'below';
-  const lowNote = Math.abs(offAvgLow) > 1 ? `${Math.abs(offAvgLow).toFixed(1)} ft. ${lowAboveBelow} average` : undefined;
-  const highNote = Math.abs(offAvgHigh) > 1 ? `${Math.abs(offAvgHigh).toFixed(1)} ft. ${highAboveBelow} average` : undefined;
-
   return (
-    <div className="flex flex-col sm:flex-row">
-      <HighLowCard className="sm:mr-2" title="Next Low" time={time} tide={low} note={lowNote}/>
-      <HighLowCard className="sm:ml-2" title="Next High" time={time} tide={high} note={highNote} />
+    <div>
+      <div className="flex flex-col sm:flex-row">
+        <HighLowCard className="sm:mr-2" title="Next Low" time={time} tide={low} avg={averageLow}/>
+        <HighLowCard className="sm:ml-2" title="Next High" time={time} tide={high} avg={averageHigh} />
+      </div>
+      <div className="flex flex-col sm:flex-row">
+        <HighLowCard className="sm:mr-2" title="2nd Low" time={time} tide={low2} avg={averageLow}/>
+        <HighLowCard className="sm:ml-2" title="2nd High" time={time} tide={high2} avg={averageHigh} />
+      </div>
     </div>
   );
 }
