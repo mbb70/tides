@@ -8,6 +8,8 @@
     "static/js/2.5616ee20.chunk.js": "/static/js/2.5616ee20.chunk.js",
     "static/js/2.5616ee20.chunk.js.map": "/static/js/2.5616ee20.chunk.js.map",
     "index.html": "/index.html",
+    "service-worker.js": "/service-worker.js",
+    "service-worker.js.map": "/service-worker.js.map",
     "static/css/main.f3a6132c.chunk.css.map": "/static/css/main.f3a6132c.chunk.css.map",
     "static/js/2.5616ee20.chunk.js.LICENSE.txt": "/static/js/2.5616ee20.chunk.js.LICENSE.txt"
   },
