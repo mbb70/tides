@@ -42,29 +42,18 @@ export const timeSelector = (state: RootState) => state.tides.time;
 export const nextTideIndex = createSelector(dataSelector, timeSelector, (data, time) => {
   return data.findIndex((entry) => time < entry.t);
 });
-export const prevTideSelector = createSelector(nextTideIndex, (nextTideIndex) => {
+export const prevTideSelector = createSelector(dataSelector, nextTideIndex, (data, nextTideIndex) => {
   return data[nextTideIndex - 1];
 });
-export const nextTideSelector = createSelector(nextTideIndex, (nextTideIndex) => {
+export const nextTideSelector = createSelector(dataSelector, nextTideIndex, (data, nextTideIndex) => {
   return data[nextTideIndex];
 });
 export const estCurrentTideSelector = createSelector(prevTideSelector, nextTideSelector, timeSelector, (prev, next, time) => {
   return prev.v + (time - prev.t) / (next.t - prev.t) * (next.v - prev.v);
 });
-
-export const nextLowTide = createSelector(nextTideIndex, dataSelector, (nextTideIndex, data) => {
-  return data[nextTideIndex].type === 'L' ? data[nextTideIndex] : data[nextTideIndex + 1];
-});
-export const nextHighTide = createSelector(nextTideIndex, dataSelector, (nextTideIndex, data) => {
-  return data[nextTideIndex].type === 'H' ? data[nextTideIndex] : data[nextTideIndex + 1];
-});
-
-export const followingLowTide = createSelector(nextTideIndex, dataSelector, (nextTideIndex, data) => {
-  return data[nextTideIndex].type === 'L' ? data[nextTideIndex + 2] : data[nextTideIndex + 3];
-});
-export const followingHighTide = createSelector(nextTideIndex, dataSelector, (nextTideIndex, data) => {
-  return data[nextTideIndex].type === 'H' ? data[nextTideIndex + 2] : data[nextTideIndex + 3];
-});
+export const nextTidesSelector = createSelector(dataSelector, nextTideIndex, (data, index) => {
+  return data.slice(index - 1, index + 9);
+})
 
 export const lowTides = createSelector(dataSelector, (data) => {
   return data.filter((e) => e.type === 'L');

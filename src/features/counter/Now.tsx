@@ -18,6 +18,28 @@ function round(n: number) {
   return ceil - n < n - floor ? ceil : floor;
 }
 
+function tideBgColor(height: number){
+  if (height < -2) {
+    return 'bg-yellow-500';
+  } else if (height < -1) {
+    return 'bg-yellow-400';
+  } else if (height < 0) {
+    return 'bg-yellow-300';
+  } else if (height < 1) {
+    return 'bg-yellow-200';
+  } else if (height < 2) {
+    return 'bg-yellow-100';
+  } else if (height < 3) {
+    return 'bg-blue-100';
+  } else if (height < 4) {
+    return 'bg-blue-200';
+  } else if (height < 5) {
+    return 'bg-blue-300';
+  } else {
+    return 'bg-blue-400';
+  }
+}
+
 export function Now() {
   const time = useAppSelector(selectTime);
   const estCurrentTide = useAppSelector(estCurrentTideSelector);
@@ -48,13 +70,15 @@ export function Now() {
     description = `Tide is ${comingGoing} (${closestTideName} ${wasIs} ${absHoursToClosest} hour${s} ${awayAgo})`
   }
 
+  const bgColor = tideBgColor(estCurrentTide);
+
   return (
-    <div className="px-4">
+    <div className="px-4 pt-2">
       <div className="text-center mb-4">
-        <span className="text-6xl sm:text-8xl text-blue-200">Tide {estCurrentTide.toFixed(1)} ft</span>
+        <span className="text-6xl text-blue-200">Tide {estCurrentTide.toFixed(1)} ft</span>
       </div>
       <div className="flex my-2">
-        <div className="text-xl text-center py-2 px-3 rounded-xl w-full bg-blue-300">
+        <div className={`text-xl text-center py-2 px-3 rounded-xl w-full ${bgColor}`}>
           <span>{description}</span>
         </div>
       </div>
