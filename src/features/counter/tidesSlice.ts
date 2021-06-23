@@ -52,7 +52,7 @@ export const estCurrentTideSelector = createSelector(prevTideSelector, nextTideS
   return prev.v + (time - prev.t) / (next.t - prev.t) * (next.v - prev.v);
 });
 export const nextTidesSelector = createSelector(dataSelector, nextTideIndex, (data, index) => {
-  return data.slice(index - 1, index + 9);
+  return data.slice(index - 1, index + 11);
 })
 
 export const lowTides = createSelector(dataSelector, (data) => {
