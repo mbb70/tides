@@ -82,7 +82,7 @@ function HighLowCard(props: { title: string, tide: DataEntry, avg: number }) {
   const note = Math.abs(offAvg) > 1 ? `${Math.abs(offAvg).toFixed(1)} ft. ${aboveBelow} average` : undefined;
   const [bgColor, pillColor] = cardColors(props.tide.type, offAvg);
   return (
-    <div className="w-full sm:w-1/2 md:w-1/4 p-2">
+    <div className="w-full sm:w-1/2 lg:w-1/3 xl:w-1/4 p-2">
       <div className={`h-full p-2 rounded-xl ${bgColor}`}>
         <div className="text-4xl mb-3 text-center">{props.title}</div>
         <div className="container flex text-center">
@@ -139,7 +139,7 @@ export function HighLow() {
   const averageHigh = useAppSelector(averageHighTide);
 
   return (
-    <div className="flex flex-wrap px-2">
+    <div className="flex flex-wrap px-2 pb-2">
       {tides.map((tide, key) => {
         const avg = tide.type === 'H' ? averageHigh : averageLow;
         const title = tideTitle(tide, key);
