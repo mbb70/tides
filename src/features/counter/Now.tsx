@@ -2,7 +2,7 @@ import React from 'react';
 
 import { useAppSelector } from '../../app/hooks';
 import {
-  selectTime,
+  timeSelector,
   estCurrentTideSelector,
   prevTideSelector,
   nextTideSelector,
@@ -41,7 +41,7 @@ function tideBgColor(height: number){
 }
 
 export function Now() {
-  const time = useAppSelector(selectTime);
+  const time = useAppSelector(timeSelector);
   const estCurrentTide = useAppSelector(estCurrentTideSelector);
   const prevTide = useAppSelector(prevTideSelector);
   const nextTide = useAppSelector(nextTideSelector);

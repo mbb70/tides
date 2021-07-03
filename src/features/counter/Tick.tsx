@@ -2,13 +2,14 @@ import React from 'react';
 
 import {
   setTime,
-  selectTime,
+  timeSelector,
 } from './tidesSlice';
 import { connect } from 'react-redux';
 import { RootState } from '../../app/store';
 
 interface Props {
   setTime: (payload: { time: number }) => void;
+  time: number;
 }
 
 class TickComponent extends React.Component<Props> {
@@ -17,8 +18,11 @@ class TickComponent extends React.Component<Props> {
   }
 
   componentDidMount() {
+    // Run time at 5 minutes a second for development
     const intervalId = setInterval(() => {
-      this.props.setTime({ time: Date.now() })
+      this.props.setTime({
+        time: process.env.NODE_ENV === 'production' ? Date.now() : this.props.time + 5*60*1000
+      })
     }, 1000)
     this.setState({ intervalId })
   }
@@ -32,7 +36,7 @@ class TickComponent extends React.Component<Props> {
 }
 const mapStateToProps = (state: RootState) => {
   return {
-    time: selectTime(state)
+    time: timeSelector(state)
   };
 };
 

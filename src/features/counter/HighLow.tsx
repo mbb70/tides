@@ -3,7 +3,7 @@ import React from 'react';
 import { useAppSelector } from '../../app/hooks';
 import { DataEntry } from './data';
 import {
-  selectTime,
+  timeSelector,
   averageHighTide,
   averageLowTide,
   nextTidesSelector,
@@ -75,14 +75,43 @@ function cardColors(type: 'H' | 'L', offAvg: number) {
   }[type]
 }
 
-function HighLowCard(props: { title: string, tide: DataEntry, avg: number }) {
-  const time = useAppSelector(selectTime);
+/**
+ * Returns the Tailwind opacity of the card, always 'opacity-100'
+ * except for the first card and last cards. The first card lowers
+ * opacity every 5 minutes for 30 minutes, at which point it disapears.
+ * The last card is hidden while the first card is visible to keep an even 12.
+*/
+function cardOpacity(index: number, tideTime: number, time: number) {
+  const timeSinceTideMinutes = (time - tideTime)/1000/60;
+  if (index !== 0 && index !== 12) return 'opacity-100';
+  if (index === 12) return timeSinceTideMinutes < 30 ? 'opacity-100' : 'hidden';
+
+  if (timeSinceTideMinutes < 5) {
+    return 'opacity-100';
+  } else if (timeSinceTideMinutes < 10) {
+    return 'opacity-90';
+  } else if (timeSinceTideMinutes < 15) {
+    return 'opacity-80';
+  } else if (timeSinceTideMinutes < 20) {
+    return 'opacity-70';
+  } else if (timeSinceTideMinutes < 25) {
+    return 'opacity-60';
+  } else if (timeSinceTideMinutes < 30) {
+    return 'opacity-50';
+  } else {
+    return 'hidden';
+  }
+}
+
+function HighLowCard(props: { title: string, tide: DataEntry, avg: number, index: number }) {
+  const time = useAppSelector(timeSelector);
   const offAvg = props.tide.v - props.avg;
   const aboveBelow = offAvg > 0 ? 'above' : 'below';
   const note = Math.abs(offAvg) > 1 ? `${Math.abs(offAvg).toFixed(1)} ft. ${aboveBelow} average` : undefined;
+  const opacity = cardOpacity(props.index, props.tide.t, time);
   const [bgColor, pillColor] = cardColors(props.tide.type, offAvg);
   return (
-    <div className="w-full sm:w-1/2 lg:w-1/3 xl:w-1/4 p-2">
+    <div className={`w-full sm:w-1/2 lg:w-1/3 xl:w-1/4 p-2 ${opacity}`}>
       <div className={`h-full p-2 rounded-xl ${bgColor}`}>
         <div className="text-4xl mb-3 text-center">{props.title}</div>
         <div className="container flex text-center">
@@ -140,10 +169,10 @@ export function HighLow() {
 
   return (
     <div className="flex flex-wrap px-2 pb-2">
-      {tides.map((tide, key) => {
+      {tides.map((tide, index) => {
         const avg = tide.type === 'H' ? averageHigh : averageLow;
-        const title = tideTitle(tide, key);
-        return <HighLowCard key={key} {...{ title, tide, avg }} />;
+        const title = tideTitle(tide, index);
+        return <HighLowCard key={index} {...{ title, tide, avg, index }} />;
       })}
     </div>
   );
