@@ -12,12 +12,6 @@ function cap(string: string) {
   return string.charAt(0).toUpperCase() + string.slice(1);
 }
 
-function round(n: number) {
-  const floor = Math.floor(n);
-  const ceil = Math.ceil(n);
-  return ceil - n < n - floor ? ceil : floor;
-}
-
 function tideBgColor(height: number){
   if (height < -2) {
     return 'bg-yellow-500';
@@ -54,7 +48,7 @@ export function Now() {
   let description = '';
 
   const closestTideName = closestTide.type === 'H' ? 'high' : 'low';
-  const absMinutestToClosest = round(Math.abs(timeToClosest) / 1000 / 60);
+  const absMinutestToClosest = Math.round(Math.abs(timeToClosest) / 1000 / 60);
   let s = absMinutestToClosest === 1 ? '' : 's';
   const awayAgo = timeToClosest < 0 ? 'away' : 'ago';
   const pastBefore = timeToClosest < 0 ? 'before' : 'past';
@@ -63,7 +57,7 @@ export function Now() {
   } else if (absMinutestToClosest < 60) {
     description = `${cap(pastBefore)} ${closestTideName} tide (${absMinutestToClosest} minute${s} ${awayAgo})`
   } else {
-    const absHoursToClosest = round(absMinutestToClosest / 60);
+    const absHoursToClosest = Math.round(absMinutestToClosest / 60);
     s = absHoursToClosest === 1 ? '' : 's';
     const wasIs = timeToClosest < 0 ? 'is' : 'was';
     const comingGoing = nextTide.type === 'L' ? 'going out' : 'coming in'
@@ -71,7 +65,6 @@ export function Now() {
   }
 
   const bgColor = tideBgColor(estCurrentTide);
-
   return (
     <div className="px-4 pt-2">
       <div className="text-center mb-4">

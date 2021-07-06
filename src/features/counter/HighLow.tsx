@@ -10,18 +10,29 @@ import {
 } from './tidesSlice';
 
 function prettyTimeDelta(deltaMillis: number) {
-  const delta = Math.abs(deltaMillis / 1000);
+  let seconds = Math.abs(deltaMillis / 1000);
   const ago = deltaMillis < 0 ? 'ago' : '';
-  if (delta < 60) return `${delta.toFixed()} seconds ${ago}`
-  let minutes = Math.floor(delta / 60);
-  let seconds = delta % 60;
-  if (minutes < 60) return `${minutes.toFixed()} minutes ${seconds.toFixed()} seconds ${ago}`
+
+  let s = seconds === 1 ? '' : 's';
+  if (seconds < 60) return `${seconds.toFixed()} second${s} ${ago}`
+
+  let minutes = Math.floor(seconds / 60);
+  seconds = seconds % 60;
+  s = minutes === 1 ? '' : 's';
+  const secondsRem = seconds > 0 ? `${seconds.toFixed()} seconds` : '';
+  if (minutes < 60) return `${minutes.toFixed()} minute${s} ${secondsRem} ${ago}`
+
   let hours = Math.floor(minutes / 60);
   minutes = minutes % 60; 
-  if (hours < 24) return `${hours.toFixed()} hours ${minutes.toFixed()} minutes ${ago}`
+  s = hours === 1 ? '' : 's';
+  const minutesRem = minutes > 0 ? `${minutes.toFixed()} minutes` : '';
+  if (hours < 24) return `${hours.toFixed()} hour${s} ${minutesRem} ${ago}`
+
   let days = Math.floor(hours / 24);
-  hours = hours % 60; 
-  return `${days.toFixed()} days ${hours.toFixed()} hours ${ago}`
+  hours = hours % 24;
+  const hoursRem = hours > 0 ? `${hours.toFixed()} hours` : '';
+  s = days === 1 ? '' : 's';
+  return `${days.toFixed()} day${s} ${hoursRem} ${ago}`
 }
 
 function prettyTimeGivenCurrentTime(epochTime: number, currentEpochTime: number) {
@@ -81,10 +92,10 @@ function cardColors(type: 'H' | 'L', offAvg: number) {
  * opacity every 5 minutes for 30 minutes, at which point it disapears.
  * The last card is hidden while the first card is visible to keep an even 12.
 */
-function cardOpacity(index: number, tideTime: number, time: number) {
-  const timeSinceTideMinutes = (time - tideTime)/1000/60;
-  if (index !== 0 && index !== 12) return 'opacity-100';
-  if (index === 12) return timeSinceTideMinutes < 30 ? 'opacity-100' : 'hidden';
+function cardOpacity(tide: DataEntry, firstTide: DataEntry, lastTide: DataEntry, time: number) {
+  const timeSinceTideMinutes = (time - tide.t)/1000/60;
+  if (tide !== firstTide && tide !== lastTide) return 'opacity-100';
+  if (tide === lastTide) return timeSinceTideMinutes < 30 ? 'opacity-100' : 'hidden';
 
   if (timeSinceTideMinutes < 5) {
     return 'opacity-100';
@@ -103,12 +114,12 @@ function cardOpacity(index: number, tideTime: number, time: number) {
   }
 }
 
-function HighLowCard(props: { title: string, tide: DataEntry, avg: number, index: number }) {
+function HighLowCard(props: { title: string, tide: DataEntry, avg: number, firstTide: DataEntry, lastTide: DataEntry }) {
   const time = useAppSelector(timeSelector);
   const offAvg = props.tide.v - props.avg;
   const aboveBelow = offAvg > 0 ? 'above' : 'below';
   const note = Math.abs(offAvg) > 1 ? `${Math.abs(offAvg).toFixed(1)} ft. ${aboveBelow} average` : undefined;
-  const opacity = cardOpacity(props.index, props.tide.t, time);
+  const opacity = cardOpacity(props.tide, props.firstTide, props.lastTide, time);
   const [bgColor, pillColor] = cardColors(props.tide.type, offAvg);
   return (
     <div className={`w-full sm:w-1/2 lg:w-1/3 xl:w-1/4 p-2 ${opacity}`}>
@@ -166,13 +177,15 @@ export function HighLow() {
   const tides = useAppSelector(nextTidesSelector);
   const averageLow = useAppSelector(averageLowTide);
   const averageHigh = useAppSelector(averageHighTide);
+  const firstTide = tides[0];
+  const lastTide = tides[tides.length - 1];
 
   return (
     <div className="flex flex-wrap px-2 pb-2">
       {tides.map((tide, index) => {
         const avg = tide.type === 'H' ? averageHigh : averageLow;
         const title = tideTitle(tide, index);
-        return <HighLowCard key={index} {...{ title, tide, avg, index }} />;
+        return <HighLowCard key={index} {...{ title, tide, avg, firstTide, lastTide }} />;
       })}
     </div>
   );
