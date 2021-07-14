@@ -6,6 +6,7 @@ import {
   estCurrentTideSelector,
   prevTideSelector,
   nextTideSelector,
+  tideEstimates,
 } from './tidesSlice';
 
 function cap(string: string) {
@@ -64,11 +65,36 @@ export function Now() {
     description = `Tide is ${comingGoing} (${closestTideName} ${wasIs} ${absHoursToClosest} hour${s} ${awayAgo})`
   }
 
+  const estimates = useAppSelector(tideEstimates);
+  const estVs = estimates.map((est) => est.v);
+  const estTs = estimates.map((est) => est.t);
+  const maxEst = Math.max(...estVs);
+  const minEst = Math.min(...estVs);
+  const maxT = Math.max(...estTs);
+  const minT = Math.min(...estTs);
+  const zeroToOneEstimates = estimates.map((est) => {
+    return { ...est, scaledT: (est.t - minT)/(maxT - minT), scaledV: (est.v - minEst)/(maxEst - minEst) };
+  })
+  const rescaledNow = (time - minT)/(maxT - minT);
+
   const bgColor = tideBgColor(estCurrentTide);
   return (
     <div className="px-4 pt-2">
-      <div className="text-center mb-4">
-        <span className="text-6xl text-blue-200">Tide {estCurrentTide.toFixed(1)} ft</span>
+      <div className="mb-4 flex">
+        <div className="flex flex-col justify-center">
+          <span className="text-7xl text-blue-200">{estCurrentTide.toFixed(1)} ft</span>
+        </div>
+        <div className="p-1 px-2 pt-2 flex-grow">
+          <div className="h-20 relative">
+            <div className={`w-0.5 h-full rounded-full opacity-60 bg-red-400 absolute`} style={{left: `${100*rescaledNow}%`}}></div>
+            {zeroToOneEstimates.map((est,i) => {
+              const display = i % 2 === 0 ? 'hidden sm:inline' : '';
+              return (
+                <span key={i} className={`${display} w-1 h-1 rounded ${tideBgColor(est.v)} absolute`} style={{bottom: `${100*est.scaledV}%`, left: `${100*est.scaledT}%`}}></span>
+              );
+            })}
+          </div>
+        </div>
       </div>
       <div className="flex my-2">
         <div className={`text-xl text-center py-2 px-3 rounded-xl w-full ${bgColor}`}>

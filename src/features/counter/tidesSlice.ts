@@ -81,14 +81,21 @@ export const estCurrentTideSelector = createSelector(dataSelector, nextTideIndex
   return tideEstimate(time, data, nextIndex);
 });
 
+function minutesToMillis(minutes: number) {
+  return minutes*60*1000;
+}
+function hoursToMillis(hours: number) {
+  return minutesToMillis(hours*60);
+}
+
 /**
- * 48 Hours of Tide Estimates in 30 minute increments, used only in testing tide estimate interpolation
+ * 24 Hours of Tide Estimates in 15 minute increments, 6 hours behind and 18 hours ahead
  */
-export const tideEstimates24Hours = createSelector(dataSelector, timeSelector, (data, time) => {
-  const interval = 30*60*1000;
-  let timeOffset = time;
+export const tideEstimates = createSelector(dataSelector, timeSelector, (data, time) => {
+  const interval = minutesToMillis(15);
+  let timeOffset = time - hoursToMillis(6);
   let estimates: DataEntry[] = [];
-  while (timeOffset < time + 48*60*60*1000) {
+  while (timeOffset < time + hoursToMillis(18)) {
     estimates.push({ type: 'L', t: timeOffset, v: tideEstimate(timeOffset, data, nextTideIndex(data, timeOffset)) });
     timeOffset += interval;
   }
@@ -96,11 +103,11 @@ export const tideEstimates24Hours = createSelector(dataSelector, timeSelector, (
 });
 
 /**
- * Returns the previous tide and the next 12, expecting the UI to remove either the first
+ * Returns the previous tide and the next 8, expecting the UI to remove either the first
  * or last, depending on how recent the previous tide was.
  */
 export const nextTidesSelector = createSelector(dataSelector, nextTideIndexSelector, (data, index) => {
-  return data.slice(index - 1, index + 12);
+  return data.slice(index - 1, index + 8);
 })
 
 export const averageLowTide = createSelector(dataSelector, (data) => {
