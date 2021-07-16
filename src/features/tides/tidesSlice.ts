@@ -89,15 +89,15 @@ function hoursToMillis(hours: number) {
 }
 
 /**
- * 26 Hours of Tide Estimates in 15 minute increments, 7 hours behind and 19 hours ahead
+ * 26 Hours of Tide Estimates in 15 minute increments, 6 hours behind and 20 hours ahead
  * Full Tide Period is 24 Hours 50 Minutes (50 extra minutes to account for travel of the moon)
  * So 26 hours should give just over 1 full period (2 highs, 2 lows) in view at all times
  */
 export const tideEstimates = createSelector(dataSelector, timeSelector, (data, time) => {
   const interval = minutesToMillis(15);
-  let timeOffset = time - hoursToMillis(7);
+  let timeOffset = time - hoursToMillis(6);
   let estimates: DataEntry[] = [];
-  while (timeOffset < time + hoursToMillis(19)) {
+  while (timeOffset < time + hoursToMillis(20)) {
     estimates.push({ type: 'L', t: timeOffset, v: tideEstimate(timeOffset, data, nextTideIndex(data, timeOffset)) });
     timeOffset += interval;
   }

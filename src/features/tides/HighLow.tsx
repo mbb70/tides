@@ -89,6 +89,8 @@ function cardColors(type: 'H' | 'L', offAvg: number) {
 function HighLowCard(props: { title: string, tide: DataEntry, avg: number, firstTide: DataEntry, lastTide: DataEntry }) {
   const time = useAppSelector(timeSelector);
   const offAvg = props.tide.v - props.avg;
+  const aboveBelow = offAvg > 0 ? 'above' : 'below';
+  const note = Math.abs(offAvg) > 1 ? `${Math.abs(offAvg).toFixed(1)} ft. ${aboveBelow} average` : undefined;
   const [bgColor, pillColor] = cardColors(props.tide.type, offAvg);
   return (
     <div className={`w-full sm:w-1/2 lg:w-1/3 xl:w-1/4 px-2 py-2`}>
@@ -102,10 +104,15 @@ function HighLowCard(props: { title: string, tide: DataEntry, avg: number, first
             <span>{props.tide.v.toFixed(1)} ft</span>
           </div>
         </div>
-        <div className="flex">
-          <div className={`text-xl p-2 w-full rounded-xl mt-2 ${pillColor} text-center`}>
+        <div className="md:flex">
+          <div className={`text-xl p-2 ${note ? 'md:w-1/2 md:mr-1' : 'w-full'} rounded-xl mt-2 ${pillColor} text-center`}>
             <span>{prettyTimeDelta(props.tide.t - time)}</span>
           </div>
+          {note && (
+            <div className={`text-xl p-2 md:w-1/2 md:ml-1 rounded-xl mt-2 ${pillColor} text-center`}>
+              <span>{note}</span>
+            </div>
+          )}
         </div>
       </div>
     </div>
