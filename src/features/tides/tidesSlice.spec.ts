@@ -1,5 +1,5 @@
 import { data } from './data'
-import counterReducer, {
+import tidesReducer, {
   TidesState,
   setTime,
 } from './tidesSlice';
@@ -12,7 +12,7 @@ describe('tides reducer', () => {
 
   it('should handle set time', () => {
     const time = Date.now();
-    const actual = counterReducer(initialState, setTime({ time }));
+    const actual = tidesReducer(initialState, setTime({ time }));
     expect(actual.time).toEqual(time);
   });
 });

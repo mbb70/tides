@@ -86,43 +86,12 @@ function cardColors(type: 'H' | 'L', offAvg: number) {
   }[type]
 }
 
-/**
- * Returns the Tailwind opacity of the card, always 'opacity-100'
- * except for the first card and last cards. The first card lowers
- * opacity every 5 minutes for 30 minutes, at which point it disapears.
- * The last card is hidden while the first card is visible to keep an even 12.
-*/
-function cardOpacity(tide: DataEntry, firstTide: DataEntry, lastTide: DataEntry, time: number) {
-  const timeSinceTideMinutes = (time - tide.t)/1000/60;
-  if (tide !== firstTide && tide !== lastTide) return 'opacity-100';
-  if (tide === lastTide) return timeSinceTideMinutes < 30 ? 'opacity-100' : 'hidden';
-
-  if (timeSinceTideMinutes < 5) {
-    return 'opacity-100';
-  } else if (timeSinceTideMinutes < 10) {
-    return 'opacity-90';
-  } else if (timeSinceTideMinutes < 15) {
-    return 'opacity-80';
-  } else if (timeSinceTideMinutes < 20) {
-    return 'opacity-70';
-  } else if (timeSinceTideMinutes < 25) {
-    return 'opacity-60';
-  } else if (timeSinceTideMinutes < 30) {
-    return 'opacity-50';
-  } else {
-    return 'hidden';
-  }
-}
-
 function HighLowCard(props: { title: string, tide: DataEntry, avg: number, firstTide: DataEntry, lastTide: DataEntry }) {
   const time = useAppSelector(timeSelector);
   const offAvg = props.tide.v - props.avg;
-  const aboveBelow = offAvg > 0 ? 'above' : 'below';
-  const note = Math.abs(offAvg) > 1 ? `${Math.abs(offAvg).toFixed(1)} ft. ${aboveBelow} average` : undefined;
-  const opacity = cardOpacity(props.tide, props.firstTide, props.lastTide, time);
   const [bgColor, pillColor] = cardColors(props.tide.type, offAvg);
   return (
-    <div className={`w-full sm:w-1/2 lg:w-1/3 xl:w-1/4 p-2 ${opacity}`}>
+    <div className={`w-full sm:w-1/2 lg:w-1/3 xl:w-1/4 px-2 py-2`}>
       <div className={`h-full p-2 rounded-xl ${bgColor}`}>
         <div className="text-4xl mb-3 text-center">{props.title}</div>
         <div className="container flex text-center">
@@ -133,15 +102,10 @@ function HighLowCard(props: { title: string, tide: DataEntry, avg: number, first
             <span>{props.tide.v.toFixed(1)} ft</span>
           </div>
         </div>
-        <div className="md:flex">
-          <div className={`text-xl p-2 ${note ? 'md:w-1/2 md:mr-1' : 'w-full'} rounded-xl mt-2 ${pillColor} text-center`}>
+        <div className="flex">
+          <div className={`text-xl p-2 w-full rounded-xl mt-2 ${pillColor} text-center`}>
             <span>{prettyTimeDelta(props.tide.t - time)}</span>
           </div>
-          {note && (
-            <div className={`text-xl p-2 md:w-1/2 md:ml-1 rounded-xl mt-2 ${pillColor} text-center`}>
-              <span>{note}</span>
-            </div>
-          )}
         </div>
       </div>
     </div>
@@ -150,9 +114,9 @@ function HighLowCard(props: { title: string, tide: DataEntry, avg: number, first
 
 function numericSuffix(index: number) {
   let suffix = 'st';
-  if (index === 2) {
+  if (index === 1) {
     suffix = 'nd';
-  } else if (index === 3) {
+  } else if (index === 2) {
     suffix = 'rd';
   } else {
     suffix = 'th';
@@ -164,11 +128,9 @@ function tideTitle(tide: DataEntry, index: number) {
   const isHigh = tide.type === 'H';
   let title = isHigh ? 'High' : 'Low';
   if (index === 0) {
-    title = `Previous: ${title}`
-  } else if (index === 1) {
-    title = `Next: ${title}`;
+    title = `Next: ${title}`
   } else {
-    title = `${index}${numericSuffix(index)}: ${title}`
+    title = `${index+1}${numericSuffix(index)}: ${title}`
   }
   return title;
 }

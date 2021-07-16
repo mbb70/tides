@@ -1,9 +1,9 @@
 import { configureStore, ThunkAction, Action } from '@reduxjs/toolkit';
-import counterReducer from '../features/counter/tidesSlice';
+import tidesReducer from '../features/tides/tidesSlice';
 
 export const store = configureStore({
   reducer: {
-    tides: counterReducer,
+    tides: tidesReducer,
   },
 });
 

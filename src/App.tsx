@@ -1,15 +1,15 @@
 import React from 'react';
-import { Now } from './features/counter/Now';
-import { Tick } from './features/counter/Tick';
-import { HighLow } from './features/counter/HighLow';
+import { Now } from './features/tides/Now';
+import { Tick } from './features/tides/Tick';
+import { HighLow } from './features/tides/HighLow';
 
 function App() {
   return (
-    <div>
+    <>
       <Tick />
       <Now />
       <HighLow />
-    </div>
+    </>
   );
 }
 
